@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Sovereign naming validator — enforces naming-grammar.md.
+"""Estate naming validator — enforces naming-grammar.md.
 Loads live configs, fails non-zero on any violation. Re-runnable.
 Usage: python3 validate.py [--no-live]  (--no-live skips the /v1/models + :25104 probes)
 """
 import json, sys, yaml, urllib.request, os
 
-HERD = os.environ.get('NAMING_HERD', '/home/toxic/sovereign/config/herd.yaml')
+HERD = os.environ.get('NAMING_HERD', '/home/toxic/estate/config/herd.yaml')
 TAU_MODELS = os.environ.get('NAMING_TAU_MODELS', '/home/toxic/.tau/agent/models.yml')
 TAU_CONFIG = os.environ.get('NAMING_TAU_CONFIG', '/home/toxic/.tau/agent/config.yml')
 ROUTER_JSON = os.environ.get('NAMING_ROUTER_JSON', '/home/toxic/.tau/model-router.json')
-HEALTH = os.environ.get('NAMING_HEALTH', '/home/toxic/sovereign/data/model-health.json')
+HEALTH = os.environ.get('NAMING_HEALTH', '/home/toxic/estate/data/model-health.json')
 
 # Generic policy words: grandfathered set may exist, new ones are violations.
 GRANDFATHERED_GENERIC = {'fast', 'tiny', 'small', 'medium', 'code', 'long', 'uncensored'}
@@ -100,9 +100,9 @@ def main():
         if not isinstance(ref, str) or '/' not in ref:
             err(f'{name}: malformed ref {ref!r}'); continue
         lane, mid = ref.split('/', 1)
-        if lane == 'sovereign':
+        if lane == 'estate':
             if not no_live and mid not in sov_live:
-                err(f'{name}: sovereign/{mid} not on live :25104 catalog')
+                err(f'{name}: estate/{mid} not on live :25104 catalog')
             continue
         if lane != 'herd':
             err(f'{name}: unknown lane {lane!r} in {ref!r}'); continue
