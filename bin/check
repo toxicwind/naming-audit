@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# naming-audit — self-test gate (PASS/FAIL).
+# Gate = estate naming-grammar validator in --no-live mode (no network, fast).
+# NOTE: as of 2026-10-22 this exits FAIL (23 failures / 288 warnings) because the
+# LIVE estate config declares lanes (flock, hodos, estate) the naming grammar does
+# not recognize. That drift is flagged in the Phase-B report; the gate is the
+# honest monitor — it surfaces the violation on every run.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+echo "== naming-audit check: start =="
+[ -f validate.py ] || { echo "FAIL: validate.py missing"; exit 1; }
+
+set +e
+out="$(python3 validate.py --no-live 2>&1)"
+rc=$?
+set -e
+echo "$out"
+
+if [ "$rc" -eq 0 ]; then
+  echo "== naming-audit check: PASS (no naming violations) =="
+  exit 0
+else
+  nfail=$(echo "$out" | grep -oE '[0-9]+ fail' | tail -1 | grep -oE '[0-9]+')
+  echo "== naming-audit check: FAIL (${nfail:-?} naming violations; see above) =="
+  exit 1
+fi

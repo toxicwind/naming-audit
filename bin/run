@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# naming-audit — primary operation: enforce the estate naming grammar over the
+# live model/herd config (validate.py).
+#
+# Usage:
+#   bin/run [--no-live]      # run the validator (default: with /v1/models + :25104 probes)
+#   bin/run check            # same gate, --no-live (fast, no network)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+PY="${PY:-python3}"
+
+if [ "${1:-}" = "check" ]; then
+  exec python3 validate.py --no-live
+fi
+exec python3 validate.py "$@"
